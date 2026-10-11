@@ -10,12 +10,12 @@ nav button{width:46px;height:46px;display:grid;place-items:center;border:1px sol
 nav button:hover{background:#e8ebdf;color:#515e3d}
 button:focus-visible{outline:2px solid #697854;outline-offset:4px}
 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.species-picker{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:7px;padding:6px;border:1px solid #d9dccd;border-radius:20px;background:#f5f3ebe6;box-shadow:0 6px 24px #69634212}
-.species-picker button{width:78px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;border-radius:14px;background:transparent;color:#777b64;font-size:11px;letter-spacing:.03em}
-.species-picker button[aria-pressed="true"]{background:#e7e9d8;color:#515c3c}
-.species-picker img{width:28px;height:28px;object-fit:contain}
+.species-picker{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:22px}
+.species-picker button{position:relative;width:44px;height:48px;display:grid;place-items:center;border:0;background:transparent;padding:0}
+.species-picker button[aria-pressed="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;background:#8e9578}
+.species-picker img{width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 2px 2px #5c59402e)}
+.species-picker button[aria-pressed="true"] img{transform:scale(1.08)}
 @media(max-width:600px){
  nav{right:18px;bottom:max(20px,env(safe-area-inset-bottom))}
- .species-picker{bottom:max(102px,calc(env(safe-area-inset-bottom) + 86px))}
- .species-picker button{width:80px;height:62px;font-size:12px}
+ .species-picker{bottom:max(106px,calc(env(safe-area-inset-bottom) + 90px))}
 }

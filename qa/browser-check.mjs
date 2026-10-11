@@ -6,7 +6,7 @@ try{
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:8765');await page.waitForTimeout(300);
  assert.equal(await page.locator('button').count(),5);
- assert.deepEqual(await page.locator('.species-picker button').allInnerTexts(),['梧桐叶','银杏叶','樱花']);
+ assert.deepEqual(await page.locator('.species-picker button').evaluateAll(buttons=>buttons.map(b=>b.getAttribute('aria-label'))),['梧桐叶','银杏叶','樱花']);
  const before=await page.locator('canvas').evaluate(el=>el.toDataURL());
  await page.getByRole('button',{name:'轻吹一下'}).click();await page.waitForTimeout(600);
  assert.equal((await page.locator('canvas').evaluate(el=>el.toDataURL()))===before,false,'breeze must change the tree');
