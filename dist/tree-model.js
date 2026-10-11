@@ -34,5 +34,12 @@ export function makeTree(){
   const id=leaves.length,branch=leaders[i%leaders.length],side=random()<.5?-1:1;
   leaves.push({id,branch,t:.46+random()*.48,side,offset:12+random()*42,rest:side*(.25+random()*1.3),size:15+random()*12,sprite:Math.floor(random()*5),layer:random()<.48?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
+ // Shape the whole scaffold around its rooted base: a deeper, narrower crown
+ // reads as a taller tree without pushing the canopy out of the mobile frame.
+ for(const b of branches){
+  b.restOrigin={x:450+(b.restOrigin.x-450)*.88,y:745+(b.restOrigin.y-745)*1.16};
+  b.origin={...b.restOrigin};
+  b.c=b.c.map(([x,y])=>[x*.88,y*1.16]);
+ }
  return{branches,leaves};
 }
