@@ -5,8 +5,8 @@ export function bezier(c,t){const u=1-t;return {x:u*u*u*c[0][0]+3*u*u*t*c[1][0]+
 export function tangent(c,t){const u=1-t;return Math.atan2(3*u*u*(c[1][1]-c[0][1])+6*u*t*(c[2][1]-c[1][1])+3*t*t*(c[3][1]-c[2][1]),3*u*u*(c[1][0]-c[0][0])+6*u*t*(c[2][0]-c[1][0])+3*t*t*(c[3][0]-c[2][0]));}
 function rotate(p,a){return{x:p.x*Math.cos(a)-p.y*Math.sin(a),y:p.x*Math.sin(a)+p.y*Math.cos(a)}}
 export class Study{
- constructor(){this.reduced=false;this.reset()}
- reset(){this.time=0;this.wind=[];this.tokens=3;this.gestureCount=0;this.trails=[];this.regrowing=false;this.growthClock=0;const model=makeTree();this.branches=model.branches;this.leaves=model.leaves;
+ constructor(kind='maple'){this.kind=kind;this.reduced=false;this.reset()}
+ reset(){this.time=0;this.wind=[];this.tokens=3;this.gestureCount=0;this.trails=[];this.regrowing=false;this.growthClock=0;const model=makeTree(this.kind);this.branches=model.branches;this.leaves=model.leaves;
  this.transform();for(const l of this.leaves){const p=this.anchor(l);Object.assign(l,p,{prev:{...p}})}
 
  }
