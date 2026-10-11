@@ -6,7 +6,7 @@ export function tangent(c,t){const u=1-t;return Math.atan2(3*u*u*(c[1][1]-c[0][1
 function rotate(p,a){return{x:p.x*Math.cos(a)-p.y*Math.sin(a),y:p.x*Math.sin(a)+p.y*Math.cos(a)}}
 export class Study{
  constructor(kind='maple'){this.kind=kind;this.reduced=false;this.reset()}
- reset(){this.time=0;this.wind=[];this.tokens=3;this.gestureCount=0;this.trails=[];this.regrowing=false;this.growthClock=0;const model=makeTree(this.kind);this.branches=model.branches;this.leaves=model.leaves;
+ reset(){this.time=0;this.wind=[];this.tokens=3;this.gestureCount=0;this.trails=[];this.regrowing=false;this.growthClock=0;this.ambientTick=0;const model=makeTree(this.kind);this.branches=model.branches;this.leaves=model.leaves;
  this.transform();for(const l of this.leaves){const p=this.anchor(l);Object.assign(l,p,{prev:{...p}})}
 
  }
@@ -16,6 +16,7 @@ export class Study{
  emit(a,b,v){if(Math.hypot(v.x,v.y)<20)return;this.wind.push({a:{...a},b:{...b},v:{...v},time:this.time});if(this.wind.length>56)this.wind.shift()}
  field(p){let x=0,y=0;for(const w of this.wind){const dx=w.b.x-w.a.x,dy=w.b.y-w.a.y,t=Math.max(0,Math.min(1,((p.x-w.a.x)*dx+(p.y-w.a.y)*dy)/(dx*dx+dy*dy||1))),r2=(p.x-w.a.x-t*dx)**2+(p.y-w.a.y-t*dy)**2,k=Math.max(0,1-r2/(140*140))**2*Math.exp(-(this.time-w.time)/.16)*STEP/.16*.95;x+=w.v.x*k;y+=w.v.y*k}const s=Math.min(1,750/(Math.hypot(x,y)||1));return{x:x*s,y:y*s}}
  beginGesture(){this.gestureCount=0}
+ shedAmbient(){if(this.reduced||this.remaining<=this.leaves.length*.96)return false;this.ambientTick++;for(let i=0;i<this.leaves.length;i++){const l=this.leaves[(this.ambientTick*97+i)%this.leaves.length];if(l.state!=='attached'||l.age<3||l.y>530)continue;l.state='falling';l.age=0;l.vx=(l.id%2?1:-1)*(12+l.id%23);l.vy=-8;l.spin=(l.id%2?1:-1)*(.18+l.id%5*.08);l.detach={x:l.x,y:l.y,angle:l.angle};this.regrowing=true;return true}return false}
  setReduced(v){this.reduced=v;if(v){for(const b of this.branches){b.theta=b.omega=0}this.transform();for(const l of this.leaves)if(l.state==='falling'){l.state='fading';l.age=0}}}
  step(h=STEP){this.time+=h;this.tokens=Math.min(3,this.tokens+12*h);this.wind=this.wind.filter(w=>this.time-w.time<.45);
  for(const b of this.branches){if(this.reduced)continue;const p=this.point(b,.7),w=this.field(p),a=b.angle+tangent(b.c,.7),target=Math.max(-.12,Math.min(.12,(-Math.sin(a)*w.x+Math.cos(a)*w.y)*(b.parent<0?0:.00022))),wn=TAU*1.5;b.omega+=(wn*wn*(target-b.theta)-2*.76*wn*b.omega)*h;b.theta+=b.omega*h}this.transform();
