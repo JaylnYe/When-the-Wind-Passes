@@ -1,2 +1,18 @@
+import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
-const browser=await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE_PATH ? {executablePath:process.env.CHROME_EXECUTABLE_PATH} : {})});const page=await browser.newPage({viewport:{width:1280,height:1000},deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:8765');await page.waitForSelector('#remaining');await page.screenshot({path:'qa/desktop.png'});await page.getByRole('button',{name:'轻吹一下'}).click();await page.waitForTimeout(1500);const after=+(await page.locator('#remaining').innerText());if(after>=54||after<=0)throw Error('Breeze count '+after);await page.screenshot({path:'qa/after-breeze.png'});await page.getByRole('button',{name:'重新长满'}).click();await page.waitForTimeout(100);if(await page.locator('#remaining').innerText()!=='54')throw Error('Reset');await page.locator('#reduced').check();await page.getByRole('button',{name:'轻吹一下'}).click();await page.waitForTimeout(1000);const reduced=+(await page.locator('#remaining').innerText());if(reduced<51||reduced>=54)throw Error('Reduced '+reduced);await page.setViewportSize({width:390,height:844});await page.screenshot({path:'qa/mobile.png'});const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);if(overflow)throw Error('Mobile overflow');if(errors.length)throw Error(errors.join('\n'));console.log(JSON.stringify({breezeRemaining:after,reducedRemaining:reduced,mobileOverflow:overflow,pageErrors:errors}));await browser.close();
+const browser=await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE_PATH?{executablePath:process.env.CHROME_EXECUTABLE_PATH}:{})});
+try{
+ const page=await browser.newPage({viewport:{width:1200,height:900}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:8765');await page.waitForTimeout(300);
+ assert.equal(await page.locator('body').innerText(),'');assert.equal(await page.locator('button').count(),2);
+ const before=await page.locator('canvas').evaluate(el=>el.toDataURL());
+ await page.getByRole('button',{name:'轻吹一下'}).click();await page.waitForTimeout(600);
+ assert.equal((await page.locator('canvas').evaluate(el=>el.toDataURL()))===before,false,'breeze must change the tree');
+ await page.getByRole('button',{name:'重新长满'}).click();await page.waitForTimeout(100);
+ assert.equal((await page.locator('canvas').evaluate(el=>el.toDataURL()))===before,true,'reset restores original scene');
+ await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'轻吹一下'}).click();await page.waitForTimeout(600);
+ await page.setViewportSize({width:390,height:844});await page.waitForTimeout(100);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ assert.deepEqual(errors,[]);console.log('Passed: no visible text, two icon buttons, breeze, reset, system motion preference and mobile layout.');
+}finally{await browser.close()}
