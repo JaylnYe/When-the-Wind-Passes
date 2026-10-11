@@ -61,6 +61,11 @@ export function makeTree(kind='maple'){
   const id=leaves.length,branch=bridgeBuds[i%bridgeBuds.length],side=random()<.5?-1:1;
   leaves.push({id,branch,t:.22+Math.floor(random()*3)*.27+(random()-.5)*.07,side,offset:5+random()*24,rest:side*(.3+random()*1.4),size:13+random()*8,sprite:pickSprite(),layer:random()<.56?'back':'front',tone:pickTone(),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
+ // Let small foreground clusters interrupt the exposed upper limbs without hiding the trunk.
+ if(!ginkgo)for(let i=0;i<(cherry?220:180);i++){
+  const id=leaves.length,branch=leaders[i%8],side=random()<.5?-1:1;
+  leaves.push({id,branch,t:.43+random()*.5,side,offset:3+random()*(cherry?20:23),rest:side*(.2+random()*1.25),size:cherry?14+random()*7:17+random()*10,sprite:pickSprite(),layer:random()<.18?'back':'front',tone:pickTone(),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+ }
  // Shape the whole scaffold around its rooted base: a deeper, narrower crown
  // reads as a taller tree without pushing the canopy out of the mobile frame.
  for(const b of ginkgo?[]:branches){
