@@ -16,12 +16,10 @@ function input(){if(!pending.length)return;const batch=pending.splice(0),a=previ
 function frame(t){raf=0;const dt=last===null?0:Math.min(.05,(t-last)/1000);last=t;acc+=dt;input();let n=0;while(acc>=STEP&&n++<6){if(pulse>0){pulse-=STEP;const p=sim.point(sim.branches[3],.6);sim.emit({x:p.x-45,y:p.y+50},{x:p.x+25,y:p.y-40},{x:1150,y:-650})}sim.step();for(const p of trail)p.age+=STEP;trail=trail.filter(p=>p.age<.45);acc-=STEP}render();if(pointer!==null||pulse>0||sim.active||trail.length)wake();else{last=null;acc=0;for(const b of sim.branches){b.theta=b.omega=0}sim.transform();for(const l of sim.leaves)if(l.state==='attached')Object.assign(l,sim.anchor(l));render();}}
 function render(){
  ctx.clearRect(0,0,width,height);ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);
- const shadow=ctx.createRadialGradient(458,752,2,458,752,110);shadow.addColorStop(0,'rgba(105,106,74,.13)');shadow.addColorStop(1,'rgba(105,106,74,0)');ctx.save();ctx.translate(0,640);ctx.scale(1,.15);ctx.fillStyle=shadow;ctx.fillRect(320,640,280,220);ctx.restore();
+ ctx.save();ctx.translate(454,747);ctx.scale(1,.16);const shadow=ctx.createRadialGradient(0,0,2,0,0,95);shadow.addColorStop(0,'rgba(105,106,74,.10)');shadow.addColorStop(1,'rgba(105,106,74,0)');ctx.fillStyle=shadow;ctx.fillRect(-95,-95,190,190);ctx.restore();
  // Back leaves remain independently removable, including while growing.
  for(const l of sim.leaves)if(['attached','growing'].includes(l.state)&&l.layer==='back')leaf(l);
  for(const b of sim.branches)drawBranch(b);
- ctx.save();ctx.strokeStyle='#8a816b';ctx.lineCap='round';
- for(const [dx,dy,w] of [[-38,8,5],[32,9,4],[-21,13,7],[19,11,6]]){ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(450,733);ctx.quadraticCurveTo(452+dx*.25,747,450+dx,745+dy);ctx.stroke()}ctx.restore();
  for(const l of sim.leaves){if(!['attached','growing'].includes(l.state)||l.layer==='back')continue;const b=sim.branches[l.branch],p=sim.point(b,l.t);ctx.strokeStyle='rgba(111,121,76,.28)';ctx.lineWidth=.35;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(l.x,l.y);ctx.stroke();leaf(l)}
  for(const l of sim.leaves)if(!['attached','growing','gone'].includes(l.state))leaf(l);
  if(trail.length>1){ctx.beginPath();ctx.moveTo(trail[0].x,trail[0].y);for(const p of trail)ctx.lineTo(p.x,p.y);ctx.strokeStyle=`rgba(135,151,113,${Math.max(0,.14*(1-trail[0].age/.45))})`;ctx.lineWidth=1;ctx.stroke()}ctx.restore();

@@ -25,9 +25,14 @@ export function makeTree(){
   }
  }
  const leaves=[];
- for(let i=0;i<900;i++){
+ for(let i=0;i<1125;i++){
   const branch=buds[i%buds.length],side=random()<.5?-1:1;
-  leaves.push({id:i,branch,t:.22+Math.pow(random(),.6)*.78,side,offset:5+random()*31,rest:side*(.3+random()*1.5),size:14+random()*12,sprite:Math.floor(random()*5),layer:random()<.36?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+  leaves.push({id:i,branch,t:.16+Math.pow(random(),.7)*.84,side,offset:5+random()*31,rest:side*(.3+random()*1.5),size:16+random()*14,sprite:Math.floor(random()*5),layer:random()<.36?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+ }
+ // Short petioles on the outer half of large limbs fill gaps between twig clusters.
+ for(let i=0;i<225;i++){
+  const id=leaves.length,branch=leaders[i%leaders.length],side=random()<.5?-1:1;
+  leaves.push({id,branch,t:.46+random()*.48,side,offset:12+random()*42,rest:side*(.25+random()*1.3),size:15+random()*12,sprite:Math.floor(random()*5),layer:random()<.48?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
  return{branches,leaves};
 }
