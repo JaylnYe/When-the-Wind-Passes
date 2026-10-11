@@ -2,6 +2,7 @@
 export function randomSource(seed=3917){return()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
 export function curvePoint(c,t){const u=1-t;return{x:u*u*u*c[0][0]+3*u*u*t*c[1][0]+3*u*t*t*c[2][0]+t*t*t*c[3][0],y:u*u*u*c[0][1]+3*u*u*t*c[1][1]+3*u*t*t*c[2][1]+t*t*t*c[3][1]}}
 export function makeTree(kind='maple'){
+ if(kind==='willow')return makeWillow();
  const ginkgo=kind==='ginkgo',cherry=kind==='cherry',random=randomSource(ginkgo?9163:cherry?5237:3917),branches=[],origin={x:450,y:745};
  function add(parent,t,end,width,bend=0){const p=parent<0?origin:(()=>{const b=branches[parent],q=curvePoint(b.c,t);return{x:b.restOrigin.x+q.x,y:b.restOrigin.y+q.y}})();const dx=end[0]-p.x,dy=end[1]-p.y;branches.push({parent,t,c:[[0,0],[dx*.24+bend,dy*.36],[dx*.8+bend*.35,dy*.78],[dx,dy]],width,theta:0,omega:0,angle:0,origin:{...p},restOrigin:p,depth:parent<0?0:branches[parent].depth+1});return branches.length-1}
  add(-1,0,ginkgo?[462,120]:cherry?[465,280]:[474,285],ginkgo?23:cherry?24:25,ginkgo?-15:-27);
@@ -72,6 +73,35 @@ export function makeTree(kind='maple'){
   b.restOrigin={x:450+(b.restOrigin.x-450)*.88,y:745+(b.restOrigin.y-745)*1.16};
   b.origin={...b.restOrigin};
   b.c=b.c.map(([x,y])=>[x*.88,y*1.16]);
+ }
+ return{branches,leaves};
+}
+
+// Willow uses its own scaffold: flexible hanging branchlets carry narrow leaves.
+function makeWillow(){
+ const random=randomSource(7403),branches=[],origin={x:450,y:745};
+ function add(parent,t,end,width,bend=0){const p=parent<0?origin:(()=>{const b=branches[parent],q=curvePoint(b.c,t);return{x:b.restOrigin.x+q.x,y:b.restOrigin.y+q.y}})();const dx=end[0]-p.x,dy=end[1]-p.y;branches.push({parent,t,c:[[0,0],[dx*.24+bend,dy*.36],[dx*.8+bend*.35,dy*.78],[dx,dy]],width,theta:0,omega:0,angle:0,origin:{...p},restOrigin:p,depth:parent<0?0:branches[parent].depth+1});return branches.length-1}
+ add(-1,0,[452,265],25,-10);
+ const specs=[
+  [0,.59,[205,260],8,-24],[0,.65,[316,178],7,-15],
+  [0,.73,[410,130],6,-7],[0,.78,[521,132],6,8],
+  [0,.68,[626,181],7,15],[0,.61,[711,265],8,23],
+  [0,.48,[255,345],6,-17],[0,.52,[663,352],6,18]
+ ];
+ const leaders=specs.map(args=>add(...args)),twigs=[];
+ for(const [k,id] of leaders.entries()){
+  const main=branches[id];
+  for(let j=0;j<11;j++){
+   const t=.3+j*.063+(random()-.5)*.035,q=curvePoint(main.c,t),x=main.restOrigin.x+q.x,y=main.restOrigin.y+q.y;
+   const drift=(j%2?1:-1)*(9+random()*32)+(k<4?-8:8),end=[x+drift,y+95+random()*150];
+   const twig=add(id,t,end,.75+random()*.55,(random()-.5)*10),b=branches[twig],dx=b.c[3][0],dy=b.c[3][1];
+   b.c=[[0,0],[dx*.75,dy*.12],[dx*.15,dy*.82],[dx,dy]];twigs.push(twig);
+  }
+ }
+ const leaves=[];
+ for(let i=0;i<1584;i++){
+  const branch=twigs[i%twigs.length],side=i%2?-1:1;
+  leaves.push({id:i,branch,t:.13+random()*.8,side,offset:2+random()*10,rest:side*(.28+random()*.78),size:8+random()*5,sprite:0,layer:random()<.4?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
  return{branches,leaves};
 }

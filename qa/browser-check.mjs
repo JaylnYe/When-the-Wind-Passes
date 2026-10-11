@@ -5,8 +5,8 @@ try{
  const page=await browser.newPage({viewport:{width:1200,height:900}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:8765');await page.waitForTimeout(300);
- assert.equal(await page.locator('button').count(),5);
- assert.deepEqual(await page.locator('.species-picker button').evaluateAll(buttons=>buttons.map(b=>b.getAttribute('aria-label'))),['梧桐叶','银杏叶','樱花']);
+ assert.equal(await page.locator('button').count(),6);
+ assert.deepEqual(await page.locator('.species-picker button').evaluateAll(buttons=>buttons.map(b=>b.getAttribute('aria-label'))),['梧桐叶','银杏叶','樱花','垂柳']);
  const before=await page.locator('canvas').evaluate(el=>el.toDataURL());
  await page.getByRole('button',{name:'轻吹一下'}).click();await page.waitForTimeout(600);
  assert.equal((await page.locator('canvas').evaluate(el=>el.toDataURL()))===before,false,'breeze must change the tree');
@@ -19,8 +19,9 @@ try{
  await page.getByRole('button',{name:'重新长满'}).click();
  await page.locator('[data-species="cherry"]').click();await page.waitForTimeout(100);
  assert.equal(await page.locator('[data-species="cherry"]').getAttribute('aria-pressed'),'true');
+ await page.locator('[data-species="willow"]').click();await page.waitForTimeout(100);assert.equal(await page.locator('[data-species="willow"]').getAttribute('aria-pressed'),'true');
  await page.locator('[data-species="maple"]').click();
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(100);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
- assert.deepEqual(errors,[]);console.log('Passed: three tree choices, breeze, reset, reduced motion and mobile layout.');
+ assert.deepEqual(errors,[]);console.log('Passed: four tree choices, breeze, reset, reduced motion and mobile layout.');
 }finally{await browser.close()}
