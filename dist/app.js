@@ -18,10 +18,10 @@ function render(){
  ctx.clearRect(0,0,width,height);ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);
  ctx.save();ctx.translate(454,747);ctx.scale(1,.16);const shadow=ctx.createRadialGradient(0,0,2,0,0,95);shadow.addColorStop(0,'rgba(105,106,74,.10)');shadow.addColorStop(1,'rgba(105,106,74,0)');ctx.fillStyle=shadow;ctx.fillRect(-95,-95,190,190);ctx.restore();
  // Back leaves remain independently removable, including while growing.
- for(const l of sim.leaves)if(['attached','growing'].includes(l.state)&&l.layer==='back')leaf(l);
+ for(const l of sim.leaves)if(['attached','loosening','growing'].includes(l.state)&&l.layer==='back')leaf(l);
  for(const b of sim.branches)drawBranch(b);
- for(const l of sim.leaves){if(!['attached','growing'].includes(l.state)||l.layer==='back')continue;const b=sim.branches[l.branch],p=sim.point(b,l.t);ctx.strokeStyle='rgba(111,121,76,.28)';ctx.lineWidth=.35;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(l.x,l.y);ctx.stroke();leaf(l)}
- for(const l of sim.leaves)if(!['attached','growing','gone'].includes(l.state))leaf(l);
+ for(const l of sim.leaves){if(!['attached','loosening','growing'].includes(l.state)||l.layer==='back')continue;const b=sim.branches[l.branch],p=sim.point(b,l.t);ctx.strokeStyle='rgba(111,121,76,.28)';ctx.lineWidth=.35;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(l.x,l.y);ctx.stroke();leaf(l)}
+ for(const l of sim.leaves)if(!['attached','loosening','growing','gone'].includes(l.state))leaf(l);
  if(trail.length>1){ctx.beginPath();ctx.moveTo(trail[0].x,trail[0].y);for(const p of trail)ctx.lineTo(p.x,p.y);ctx.strokeStyle=`rgba(135,151,113,${Math.max(0,.14*(1-trail[0].age/.45))})`;ctx.lineWidth=1;ctx.stroke()}ctx.restore();
 }
 function point(c,t){const u=1-t;return{x:u*u*u*c[0][0]+3*u*u*t*c[1][0]+3*u*t*t*c[2][0]+t*t*t*c[3][0],y:u*u*u*c[0][1]+3*u*u*t*c[1][1]+3*u*t*t*c[2][1]+t*t*t*c[3][1]}}
@@ -32,7 +32,7 @@ function drawBranch(b){
  const tone=ctx.createLinearGradient(-b.width,0,b.width,0);tone.addColorStop(0,'#716e58');tone.addColorStop(.45,'#a19a7f');tone.addColorStop(.75,'#8d876e');tone.addColorStop(1,'#77735f');ctx.fillStyle=tone;ctx.fill(outline);
  if(b.width>5){ctx.clip(outline);for(let i=0;i<9;i++){ctx.strokeStyle=i%2?'rgba(222,212,172,.3)':'rgba(78,77,61,.20)';ctx.lineWidth=.5+(i%3)*.4;ctx.beginPath();for(let j=0;j<16;j++){const t=j/15,p=point(b.c,t),x=p.x+Math.sin(j*.7+i)*2+(i-4)*b.width/10;j?ctx.lineTo(x,p.y):ctx.moveTo(x,p.y)}ctx.stroke()}}ctx.restore();
 }
-function leaf(l){ctx.save();ctx.globalAlpha=l.alpha*(l.layer==='back'?.8:1);ctx.translate(l.x,l.y);ctx.rotate(l.angle);if(l.state==='growing'&&!sim.reduced){const g=l.growth*l.growth*(3-2*l.growth);ctx.scale(g,g)}if(l.state==='falling'&&!sim.reduced)ctx.scale(.6+.4*Math.abs(Math.cos(l.age*3)),1);const im=leafTones[l.sprite][l.tone]||sprites[l.sprite];if(im){const w=l.size,h=l.size*im.height/im.width;ctx.drawImage(im,-w*.5,-h*.85,w,h)}else{ctx.fillStyle=l.id%3?'#a5ad73':'#cfba72';ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(-12,-8,-8,-18,0,-24);ctx.bezierCurveTo(13,-15,13,-8,0,0);ctx.fill()}ctx.restore()}
+function leaf(l){ctx.save();ctx.globalAlpha=l.alpha*(l.layer==='back'?.8:1);ctx.translate(l.x,l.y);ctx.rotate(l.angle);if(l.state==='growing'&&!sim.reduced){const g=l.growth*l.growth*(3-2*l.growth);ctx.scale(g,g)}if(l.state==='falling'&&!sim.reduced)ctx.scale(.62+.38*Math.abs(Math.cos(l.age*(l.id%5===0?3.2:1.8))),1);const im=leafTones[l.sprite][l.tone]||sprites[l.sprite];if(im){const w=l.size,h=l.size*im.height/im.width;ctx.drawImage(im,-w*.5,-h*.85,w,h)}else{ctx.fillStyle=l.id%3?'#a5ad73':'#cfba72';ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(-12,-8,-8,-18,0,-24);ctx.bezierCurveTo(13,-15,13,-8,0,0);ctx.fill()}ctx.restore()}
 document.querySelector('#breeze').addEventListener('click',()=>{sim.beginGesture();pulse=.65;wake()});
  document.querySelector('#reset').addEventListener('click',()=>{finish();sim.reset();sim.setReduced(media.matches);pulse=0;trail=[];last=null;acc=0;wake()});
  media.addEventListener('change',e=>{sim.setReduced(e.matches);trail=[];wake()});

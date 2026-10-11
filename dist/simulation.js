@@ -19,18 +19,19 @@ export class Study{
  setReduced(v){this.reduced=v;if(v){for(const b of this.branches){b.theta=b.omega=0}this.transform();for(const l of this.leaves)if(l.state==='falling'){l.state='fading';l.age=0}}}
  step(h=STEP){this.time+=h;this.tokens=Math.min(3,this.tokens+12*h);this.wind=this.wind.filter(w=>this.time-w.time<.45);
  for(const b of this.branches){if(this.reduced)continue;const p=this.point(b,.7),w=this.field(p),a=b.angle+tangent(b.c,.7),target=Math.max(-.12,Math.min(.12,(-Math.sin(a)*w.x+Math.cos(a)*w.y)*(b.parent<0?0:.00022))),wn=TAU*1.5;b.omega+=(wn*wn*(target-b.theta)-2*.76*wn*b.omega)*h;b.theta+=b.omega*h}this.transform();
- let attached=this.remaining;const branchCounts=new Array(this.branches.length).fill(0);for(const l of this.leaves)if(l.state==='attached')branchCounts[l.branch]++;
- for(const l of this.leaves){l.age+=h;if(l.state==='growing'){const p=this.anchor(l);Object.assign(l,p);l.growth=Math.min(1,l.age/2.4);l.alpha=this.reduced?l.growth:1;if(l.growth===1){l.state='attached';l.stress=0;l.age=0}continue}if(l.state==='attached'){const p=this.anchor(l),av={x:(p.x-l.x)/h,y:(p.y-l.y)/h},w=this.field(p);l.x=p.x;l.y=p.y;l.angle=p.angle;l.stress=Math.max(0,l.stress*Math.exp(-h/.38)+Math.max(0,Math.hypot(w.x-av.x,w.y-av.y)-75)/260*h);
- if(l.stress>l.threshold&&this.tokens>=1&&attached>Math.ceil(this.leaves.length*.4)&&branchCounts[l.branch]>3&&l.age>3&&(!this.reduced||this.gestureCount<3)){attached--;branchCounts[l.branch]--;this.tokens-=1;this.gestureCount++;l.state=this.reduced?'fading':'falling';l.age=0;l.vx=av.x+w.x*.3;l.vy=av.y+w.y*.3;l.spin=(l.id%2?1:-1)*(.5+(l.id%5)*.18);l.detach={x:l.x,y:l.y,angle:l.angle};}
- }else if(l.state==='falling'){const w=this.field(l);l.vx+=(1.4*(w.x-l.vx)+32*Math.sin(this.time*5+l.id))*h;l.vy+=(155+1.4*(w.y-l.vy))*h;l.x+=l.vx*h;l.y+=l.vy*h;l.angle+=l.spin*h;if(l.y+l.size*.65>=751){l.y=751-l.size*.65;l.state='grounded';l.age=0;l.vx=l.vy=0}if(l.x<-100||l.x>1000||l.age>15){l.state='fading';l.age=0}}
- else if(l.state==='grounded'&&l.age>.9){l.state='fading';l.age=0}
- else if(l.state==='fading'){const t=Math.min(1,l.age/(this.reduced?.15:1.2));l.alpha=1-t*t*(3-2*t);if(t>=1){l.state='gone';l.age=0}}
+ let attached=this.remaining;const branchCounts=new Array(this.branches.length).fill(0);for(const l of this.leaves)if(l.state==='attached'||l.state==='loosening')branchCounts[l.branch]++;
+ for(const l of this.leaves){l.age+=h;if(l.state==='growing'){const p=this.anchor(l);Object.assign(l,p);l.growth=Math.min(1,l.age/2.4);l.alpha=this.reduced?l.growth:1;if(l.growth===1){l.state='attached';l.stress=0;l.age=0}continue}if(l.state==='attached'||l.state==='loosening'){const p=this.anchor(l),av={x:(p.x-l.x)/h,y:(p.y-l.y)/h},w=this.field(p);l.x=p.x;l.y=p.y;l.angle=p.angle;l.stress=Math.max(0,l.stress*Math.exp(-h/.38)+Math.max(0,Math.hypot(w.x-av.x,w.y-av.y)-75)/260*h);
+ if(l.state==='attached'&&l.stress>l.threshold&&l.age>3){l.state='loosening';l.releaseAge=0;l.releaseDelay=(l.id*37%13)*.035}
+ if(l.state==='loosening'){l.releaseAge+=h;if(l.releaseAge>=l.releaseDelay&&this.tokens>=1&&attached>Math.ceil(this.leaves.length*.4)&&branchCounts[l.branch]>3&&(!this.reduced||this.gestureCount<3)){attached--;branchCounts[l.branch]--;this.tokens-=1;this.gestureCount++;l.state=this.reduced?'fading':'falling';l.age=0;l.vx=av.x+w.x*.3;l.vy=av.y+w.y*.3;l.spin=(l.id%2?1:-1)*(l.id%5===0?1.1:.22+(l.id%4)*.11);l.detach={x:l.x,y:l.y,angle:l.angle}}else if(l.releaseAge>1.2){l.state='attached';l.stress=0}}
+ }else if(l.state==='falling'){const w=this.field(l),drag=1.05+(l.id%4)*.13,gravity=120+(l.id%5)*13,flutter=25+(l.id%7)*8,phase=l.id*2.399;l.vx+=(drag*(w.x-l.vx)+flutter*Math.sin(this.time*(3.5+(l.id%5)*.35)+phase))*h;l.vy+=(gravity+drag*(w.y-l.vy))*h;l.x+=l.vx*h;l.y+=l.vy*h;const heightAboveGround=Math.max(0,751-l.y);l.angle+=(l.spin+.35*Math.sin(this.time*3+phase))*Math.min(1,heightAboveGround/95)*h;if(l.y+l.size*.65>=751){l.y=751-l.size*.65;l.state='grounded';l.age=0;l.vx=l.vy=0}if(l.x<-100||l.x>1000||l.age>15){l.state='fading';l.age=0}}
+ else if(l.state==='grounded'&&l.age>1.6+(l.id%4)*.3){l.state='fading';l.age=0}
+ else if(l.state==='fading'){const t=Math.min(1,l.age/(this.reduced?.15:1.6));l.alpha=1-t*t*(3-2*t);if(t>=1){l.state='gone';l.age=0}}
  }
- const crown=this.leaves.filter(l=>['attached','growing'].includes(l.state)).length;
+ const crown=this.leaves.filter(l=>['attached','loosening','growing'].includes(l.state)).length;
  if(crown<this.leaves.length*.75)this.regrowing=true;
  if(this.regrowing){this.growthClock+=h;if(this.growthClock>=.16){const ready=this.leaves.filter(l=>l.state==='gone'&&l.age>.6);ready.sort((a,b)=>branchCounts[a.branch]-branchCounts[b.branch]||a.id-b.id);const l=ready[0];if(l){Object.assign(l,this.anchor(l),{state:'growing',age:0,growth:0,alpha:this.reduced?0:1,stress:0,vx:0,vy:0,spin:0});this.growthClock=0}}
  if(crown===this.leaves.length){this.regrowing=false;this.growthClock=0}}
  }
- get remaining(){return this.leaves.filter(l=>l.state==='attached').length}
+ get remaining(){return this.leaves.filter(l=>l.state==='attached'||l.state==='loosening').length}
  get active(){return this.regrowing||this.wind.length>0||this.branches.some(b=>Math.abs(b.theta)>.00005||Math.abs(b.omega)>.0001)||this.leaves.some(l=>!['attached','gone'].includes(l.state))}
 }
