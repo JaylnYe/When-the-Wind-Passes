@@ -12,7 +12,8 @@ export function makeTree(kind='maple'){
  [0,.66,[309,205],7,-18],[0,.72,[598,187],7,19],
  [0,.78,[419,139],5,-8],[0,.82,[520,130],5,11],
  [1,.65,[124,362],3,-10],[2,.66,[757,340],3,10],
- [3,.58,[146,258],3,-8],[4,.62,[744,246],3,9]
+ [3,.58,[146,258],3,-8],[4,.62,[744,246],3,9],
+ [1,.54,[363,270],3,-11],[2,.54,[548,258],3,11]
  ]:ginkgo?[
  [0,.36,[245,415],7,-18],[0,.43,[650,382],8,20],
  [0,.48,[300,320],6,-10],[0,.53,[595,300],7,10],
@@ -28,31 +29,37 @@ export function makeTree(kind='maple'){
  [3,.57,[188,270],4,-13],[4,.64,[680,216],3,17],
  [5,.65,[300,147],4,-12],[6,.66,[561,139],3,15]
  ];
- const leaders=specs.map(args=>add(...args));const buds=[];
+ const leaders=specs.map(args=>add(...args));const buds=[],bridgeBuds=[];
  for(const [k,id] of leaders.entries()){
   const main=branches[id],end=main.c[3],length=Math.hypot(...end),direction=Math.atan2(end[1],end[0]);
   const count=ginkgo?7+(k%2):cherry?7+(k%3):5+(k%3);
   for(let j=0;j<count;j++){
    const t=(ginkgo?.28:.18)+(j/(count-1))*(ginkgo?.7:.78)+(random()-.5)*.08,p=curvePoint(main.c,t),angle=direction+(j%2?1:-1)*(.32+random()*.8),len=(ginkgo?24:28)+random()*(ginkgo?49:58);
    const x=main.restOrigin.x+p.x+Math.cos(angle)*len,y=main.restOrigin.y+p.y+Math.sin(angle)*len;
-   const twig=add(id,t,[x,y],1.3+random()*.8,(random()-.5)*18);buds.push(twig);
+   const twig=add(id,t,[x,y],1.3+random()*.8,(random()-.5)*18);buds.push(twig);if(cherry&&k>=leaders.length-2)bridgeBuds.push(twig);
   }
  }
  const leaves=[];
- const pickSprite=()=>!ginkgo&&!cherry?Math.floor(random()*5):ginkgo?[0,0,0,1,1,2][Math.floor(random()*6)]:[0,0,0,1,1,2][Math.floor(random()*6)];
+ const pickSprite=()=>!ginkgo&&!cherry?Math.floor(random()*5):[0,0,0,1,1,2][Math.floor(random()*6)];
+ const pickTone=()=>{if(ginkgo||cherry)return Math.floor(random()*3);const n=random();return n<.12?0:n<.44?1:n<.72?2:n<.92?3:4};
  for(let i=0;i<(ginkgo?1125:cherry?1280:1250);i++){
   const branch=buds[i%buds.length],side=random()<.5?-1:1;
-  leaves.push({id:i,branch,t:cherry?.18+Math.floor(random()*4)*.22+(random()-.5)*.085:.16+Math.pow(random(),.7)*.84,side,offset:5+random()*(ginkgo?24:31),rest:side*(.3+random()*1.5),size:ginkgo?15+random()*14:cherry?14+random()*8:16+random()*14,sprite:pickSprite(),layer:random()<.36?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+  leaves.push({id:i,branch,t:cherry?.18+Math.floor(random()*4)*.22+(random()-.5)*.085:.16+Math.pow(random(),.7)*.84,side,offset:5+random()*(ginkgo?24:31),rest:side*(.3+random()*1.5),size:ginkgo?15+random()*14:cherry?14+random()*8:16+random()*14,sprite:pickSprite(),layer:random()<.36?'back':'front',tone:pickTone(),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
  // Short petioles on the outer half of large limbs fill gaps between twig clusters.
  for(let i=0;i<225;i++){
   const id=leaves.length,branch=leaders[i%leaders.length],side=random()<.5?-1:1;
-  leaves.push({id,branch,t:.46+random()*.48,side,offset:12+random()*(ginkgo?31:42),rest:side*(.25+random()*1.3),size:ginkgo?14+random()*15:cherry?13+random()*8:15+random()*12,sprite:pickSprite(),layer:random()<.48?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+  leaves.push({id,branch,t:.46+random()*.48,side,offset:12+random()*(ginkgo?31:42),rest:side*(.25+random()*1.3),size:ginkgo?14+random()*15:cherry?13+random()*8:15+random()*12,sprite:pickSprite(),layer:random()<.48?'back':'front',tone:pickTone(),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
  // Fill the inside of each crown as separate leaves, preserving natural gaps at its edge.
  for(let i=0;i<(ginkgo?650:cherry?470:600);i++){
   const id=leaves.length,branch=leaders[i%leaders.length],side=random()<.5?-1:1;
-  leaves.push({id,branch,t:(ginkgo?.18:.24)+random()*(ginkgo?.7:.58),side,offset:7+random()*(ginkgo?34:24),rest:side*(.25+random()*1.3),size:ginkgo?14+random()*16:cherry?12+random()*8:14+random()*10,sprite:pickSprite(),layer:random()<(ginkgo?.46:.72)?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+  leaves.push({id,branch,t:(ginkgo?.18:.24)+random()*(ginkgo?.7:.58),side,offset:7+random()*(ginkgo?34:24),rest:side*(.25+random()*1.3),size:ginkgo?14+random()*16:cherry?12+random()*8:14+random()*10,sprite:pickSprite(),layer:random()<(ginkgo?.46:.72)?'back':'front',tone:pickTone(),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
+ }
+ // A few clusters on inward-pointing twigs close the two large gaps beside the crown centre.
+ if(cherry)for(let i=0;i<180;i++){
+  const id=leaves.length,branch=bridgeBuds[i%bridgeBuds.length],side=random()<.5?-1:1;
+  leaves.push({id,branch,t:.22+Math.floor(random()*3)*.27+(random()-.5)*.07,side,offset:5+random()*24,rest:side*(.3+random()*1.4),size:13+random()*8,sprite:pickSprite(),layer:random()<.56?'back':'front',tone:pickTone(),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
  // Shape the whole scaffold around its rooted base: a deeper, narrower crown
  // reads as a taller tree without pushing the canopy out of the mobile frame.
