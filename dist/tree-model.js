@@ -40,7 +40,7 @@ export function makeTree(kind='maple'){
  }
  const leaves=[];
  const pickSprite=()=>!ginkgo&&!cherry?Math.floor(random()*5):ginkgo?[0,0,0,1,1,2][Math.floor(random()*6)]:[0,0,0,1,1,2][Math.floor(random()*6)];
- for(let i=0;i<1125;i++){
+ for(let i=0;i<(ginkgo?1125:cherry?1280:1250);i++){
   const branch=buds[i%buds.length],side=random()<.5?-1:1;
   leaves.push({id:i,branch,t:cherry?.18+Math.floor(random()*4)*.22+(random()-.5)*.085:.16+Math.pow(random(),.7)*.84,side,offset:5+random()*(ginkgo?24:31),rest:side*(.3+random()*1.5),size:ginkgo?15+random()*14:cherry?14+random()*8:16+random()*14,sprite:pickSprite(),layer:random()<.36?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
@@ -50,7 +50,7 @@ export function makeTree(kind='maple'){
   leaves.push({id,branch,t:.46+random()*.48,side,offset:12+random()*(ginkgo?31:42),rest:side*(.25+random()*1.3),size:ginkgo?14+random()*15:cherry?13+random()*8:15+random()*12,sprite:pickSprite(),layer:random()<.48?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
  // Fill the inside of each crown as separate leaves, preserving natural gaps at its edge.
- for(let i=0;i<(ginkgo?650:300);i++){
+ for(let i=0;i<(ginkgo?650:cherry?470:600);i++){
   const id=leaves.length,branch=leaders[i%leaders.length],side=random()<.5?-1:1;
   leaves.push({id,branch,t:(ginkgo?.18:.24)+random()*(ginkgo?.7:.58),side,offset:7+random()*(ginkgo?34:24),rest:side*(.25+random()*1.3),size:ginkgo?14+random()*16:cherry?12+random()*8:14+random()*10,sprite:pickSprite(),layer:random()<(ginkgo?.46:.72)?'back':'front',tone:Math.floor(random()*3),growth:1,state:'attached',stress:0,threshold:.14+random()*.13,x:0,y:0,vx:0,vy:0,angle:0,spin:0,age:4,alpha:1});
  }
