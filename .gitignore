@@ -4,5 +4,7 @@ qa/*.webm
 
 .openai/
 node_modules/
+/dist/assets/jacaranda-cluster-light.png
+/dist/assets/jacaranda-cluster.png
 .env
 .env.*

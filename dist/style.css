@@ -1,28 +1,30 @@
-:root{color-scheme:light;background:#f5f3eb}
+:root{color-scheme:light;background:#d5dfe0}
 *{box-sizing:border-box}
 body{margin:0}
-main{position:relative;width:100%;height:100svh;min-height:320px;background:radial-gradient(ellipse at 32% 24%,#fff9e9 0,transparent 53%),radial-gradient(ellipse at 50% 66%,#eeeee1 0,transparent 60%)}
+main{--sky-top:#c4d6d5;--sky-middle:#d9e4e1;--sky-horizon:#e9ede8;--ground:#f5f0e8;--canopy-haze:#a9c3c079;--sunlight:#fff7e6d4;--garden-haze:#a7bdaa38;--low-light:#f8e8ce62;position:relative;width:100%;height:100svh;min-height:320px;background:radial-gradient(ellipse 60% 35% at 11% 13%,var(--sunlight) 0%,transparent 78%),radial-gradient(ellipse 83% 44% at 50% 38%,var(--canopy-haze) 0%,transparent 91%),radial-gradient(ellipse 68% 16% at 51% 71%,var(--garden-haze) 0%,transparent 100%),radial-gradient(ellipse 88% 24% at 52% 76%,var(--low-light) 0%,transparent 100%),linear-gradient(180deg,var(--sky-top) 0%,var(--sky-middle) 46%,var(--sky-horizon) 70%,var(--ground) 100%)}
+main[data-species="maple"]{--sky-top:#c3d4d3;--sunlight:#fff1d9d1;--garden-haze:#b7bb9a3d;--low-light:#f6e2c77c}
+main[data-species="ginkgo"]{--sky-top:#c4d4cf;--sky-middle:#dee6dc;--sunlight:#fff5d7ca;--garden-haze:#bcc39e40;--low-light:#f7e6bd75}
+main[data-species="cherry"]{--sky-top:#b9cbd0;--sky-middle:#d1dfe1;--canopy-haze:#9db7bb75;--sunlight:#faf6edb0;--garden-haze:#afc0b53a;--low-light:#f7e9db50}
+main[data-species="willow"]{--sky-top:#bdd3d3;--sky-middle:#d8e5e0;--canopy-haze:#a8c9bf66;--garden-haze:#a9c3ab46;--low-light:#eef0cf67}
+main[data-species="jacaranda"]{--sky-top:#c7d8d9;--sky-middle:#dce5e2;--canopy-haze:#b6c9c67a;--sunlight:#fff7e5cf;--garden-haze:#b8c1b745;--low-light:#f2e9dc63}
+main::before{content:"";position:absolute;inset:0;background:url('assets/sky-grain.png') repeat;opacity:.4;pointer-events:none}
 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 canvas:active{cursor:grabbing}
-nav{position:absolute;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));display:flex;gap:10px}
+nav{position:absolute;z-index:1;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));display:flex;gap:10px}
 button{font:inherit;cursor:pointer}
-nav button{width:46px;height:46px;display:grid;place-items:center;border:1px solid #d7dbce;border-radius:50%;background:#f5f3ebbd;color:#7c896a}
-nav button:hover{background:#e8ebdf;color:#515e3d}
-button:focus-visible{outline:2px solid #697854;outline-offset:4px}
+nav button,#sound{width:46px;height:46px;display:grid;place-items:center;border:1px solid #a7bdc1;border-radius:50%;background:#f0f8f6c9;color:#4f6d72}
+nav button:hover,#sound:hover{background:#e6f2f0;color:#344e53}
+#sound{position:absolute;z-index:1;left:max(24px,env(safe-area-inset-left));bottom:max(24px,env(safe-area-inset-bottom))}
+#sound[aria-pressed="false"] .sound-wave,#sound[aria-pressed="true"] .sound-slash{display:none}
+button:focus-visible{outline:2px solid #456a72;outline-offset:4px}
 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.species-picker{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:16px}
+.species-picker{position:absolute;z-index:1;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:16px}
 .species-picker button{position:relative;width:44px;height:48px;display:grid;place-items:center;border:0;background:transparent;padding:0}
-.species-picker button[aria-pressed="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;background:#8e9578}
-.species-picker img{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 2px 2px #5c59402e)}
-.species-picker button[data-species="maple"] img{width:36px;height:36px}
-.species-picker button[data-species="ginkgo"] img{width:30px;height:30px}
-.species-picker button[data-species="cherry"] img{width:30px;height:30px}
-.willow-icon{position:relative;display:block;width:34px;height:36px}
-.species-picker .willow-icon img{position:absolute;width:9px;height:35px;object-fit:fill;top:0}
-.willow-icon img:nth-child(1){left:5px;transform:rotate(-25deg)}
-.willow-icon img:nth-child(2){left:13px;top:2px;transform:rotate(4deg)}
-.willow-icon img:nth-child(3){left:22px;transform:rotate(24deg)}
+.species-picker button[aria-pressed="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;background:#4f7076}
+.species-picker img{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 2px 2px #5c59402e)}
+.species-picker button[data-species="willow"] img{transform:scale(1.12)}
 @media(max-width:600px){
  nav{right:18px;bottom:max(20px,env(safe-area-inset-bottom))}
+ #sound{left:18px;bottom:max(20px,env(safe-area-inset-bottom))}
  .species-picker{bottom:max(88px,calc(env(safe-area-inset-bottom) + 72px))}
 }
